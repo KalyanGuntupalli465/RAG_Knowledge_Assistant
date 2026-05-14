@@ -2,90 +2,28 @@
 
 A full-stack AI-powered document assistant that allows users to upload PDFs, ask context-aware questions, and generate intelligent summaries using a Retrieval-Augmented Generation (RAG) pipeline.
 
-An AI-powered Retrieval-Augmented Generation (RAG) application that allows users to upload PDF documents, ask questions, and generate intelligent summaries using Large Language Models.
+🔗 **Live Demo:** [https://rag-knowledge-assistant-sigma.vercel.app/](https://rag-knowledge-assistant-sigma.vercel.app/)
 
-Built with FastAPI, ChromaDB, ONNX embeddings, Groq LLM, React, and Vite.
-
----
-
-# 🚀 Live Demo
-
-### Frontend
-
-🔗 [https://rag-knowledge-assistant-sigma.vercel.app/](https://rag-knowledge-assistant-sigma.vercel.app/)
-
-### Backend API
-
-🔗 [https://rag-knowledge-assistant-zpwr.onrender.com/docs](https://rag-knowledge-assistant-zpwr.onrender.com/docs)
+⚙️ **Backend API:** [https://rag-knowledge-assistant-zpwr.onrender.com/docs](https://rag-knowledge-assistant-zpwr.onrender.com/docs)
 
 ---
 
-# 📌 Features
+## ✨ Features
 
 * 📄 Upload and index PDF documents instantly
-
-* 💬 Chat with uploaded documents using AI-powered semantic retrieval
-
-* ✨ Generate concise document summaries
-
+* 💬 Chat with uploaded documents using semantic retrieval
+* ✨ Generate concise AI-powered document summaries
 * 📚 Support for multiple uploaded documents
-
-* 🗑️ Delete and manage indexed document collections
-
+* 🧠 Context-aware answers grounded in uploaded PDFs
+* 🔍 Semantic search using ChromaDB vector database
 * ⚡ Fast inference using Groq LLM
-
-* 🧠 Semantic vector search using ChromaDB
-
+* 🗑️ Delete and manage indexed document collections
 * 🌐 Fully deployed full-stack architecture using Vercel + Render
-
 * 📱 Responsive and modern user interface
 
-* 📄 Upload PDF documents
-
-* ✂️ Intelligent text chunking
-
-* 🔍 Semantic search using vector embeddings
-
-* 🤖 Ask questions from uploaded PDFs
-
-* ✨ AI-generated document summaries
-
-* ⚡ Fast inference using Groq LLM
-
-* 🧠 ChromaDB vector database integration
-
-* 🌐 Full-stack deployment using Vercel + Render
-
-* 📱 Responsive and modern UI
-
 ---
 
-# 🛠️ Tech Stack
-
-## Frontend
-
-* React.js
-* Vite
-* Axios
-* Tailwind CSS
-
-## Backend
-
-* FastAPI
-* Python
-* ChromaDB
-* ONNX Runtime
-* pdfplumber
-* Groq API
-
-## Deployment
-
-* Vercel (Frontend)
-* Render (Backend)
-
----
-
-# 🧩 System Architecture
+## 🏗️ Architecture
 
 ```text
 Frontend (React + Vite)
@@ -96,56 +34,52 @@ PDF Parsing + Chunking
         ↓
 ChromaDB Vector Store
         ↓
+ONNX Embedding Generation
+        ↓
 Semantic Retrieval
         ↓
 Groq LLM Response Generation
 ```
 
----
-
-# 🏗️ Architecture Overview
-
-```text
-User Uploads PDF
-        ↓
-PDF Parsing (pdfplumber)
-        ↓
-Text Chunking
-        ↓
-ChromaDB + ONNX Embeddings
-        ↓
-Semantic Retrieval
-        ↓
-Groq LLM
-        ↓
-AI Response / Summary
-```
+| Layer            | Technology                                         |
+| ---------------- | -------------------------------------------------- |
+| Frontend         | React, Vite, Tailwind CSS                          |
+| Backend          | FastAPI, Python                                    |
+| Vector Database  | ChromaDB (persistent vector database)              |
+| Embeddings       | ChromaDB `DefaultEmbeddingFunction` (ONNX Runtime) |
+| LLM              | Groq — `llama-3.1-8b-instant`                      |
+| Frontend Hosting | Vercel                                             |
+| Backend Hosting  | Render                                             |
 
 ---
 
-# 📂 Project Structure
+## 🗂️ Project Structure
 
 ```text
 RAG-Knowledge-Assistant/
 │
 ├── backend/
-│   ├── main.py
+│   ├── main.py                  # FastAPI routes and API setup
 │   ├── requirements.txt
 │   ├── runtime.txt
-│   ├── chroma_db/
+│   ├── chroma_db/               # Persistent vector database
 │   ├── uploaded_pdfs/
 │   └── rag_pipeline/
-│       ├── pdf_parser.py
-│       ├── chunker.py
-│       ├── retriever.py
-│       ├── vector_store.py
-│       └── llm.py
+│       ├── pdf_parser.py        # PDF text extraction
+│       ├── chunker.py           # Text chunking logic
+│       ├── vector_store.py      # ChromaDB operations
+│       ├── retriever.py         # Semantic retrieval
+│       └── llm.py               # Groq LLM integration
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx
 │   │   ├── api/
 │   │   ├── components/
+│   │   │   ├── UploadPanel.jsx
+│   │   │   ├── ChatPanel.jsx
+│   │   │   ├── SummaryPanel.jsx
+│   │   │   └── MessageBubble.jsx
 │   │   └── pages/
 │   └── vite.config.js
 │
@@ -154,56 +88,39 @@ RAG-Knowledge-Assistant/
 
 ---
 
-# ⚙️ How the RAG Pipeline Works
+## ⚙️ How the RAG Pipeline Works
 
 1. User uploads a PDF document
 2. PDF text is extracted using pdfplumber
 3. Text is split into overlapping chunks
-4. ChromaDB generates vector embeddings
-5. Embeddings are stored in the vector database
-6. User asks a question
+4. ChromaDB generates vector embeddings using ONNX Runtime
+5. Embeddings are stored persistently in the vector database
+6. User asks a question about the document
 7. Most relevant chunks are retrieved semantically
 8. Retrieved context is sent to Groq LLM
-9. AI generates context-aware response
-
-```text
-RAG-Knowledge-Assistant/
-│
-├── backend/
-│   ├── main.py
-│   ├── requirements.txt
-│   ├── rag_pipeline/
-│   │   ├── chunker.py
-│   │   ├── pdf_parser.py
-│   │   ├── retriever.py
-│   │   ├── vector_store.py
-│   │   └── llm.py
-│   │
-│   └── uploaded_pdfs/
-│
-├── frontend/
-│   ├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-│
-└── README.md
-```
+9. AI generates context-aware grounded response
 
 ---
 
-# ⚙️ Backend Setup
+## 🚀 Running Locally
 
-## 1️⃣ Clone Repository
+### Prerequisites
+
+* Python 3.11+
+* Node.js 18+
+* Groq API Key
+
+---
+
+## Backend Setup
+
+### 1️⃣ Navigate to Backend
 
 ```bash
-git clone https://github.com/your-username/rag-knowledge-assistant.git
-cd rag-knowledge-assistant/backend
+cd backend
 ```
 
----
-
-## 2️⃣ Create Virtual Environment
+### 2️⃣ Create Virtual Environment
 
 ```bash
 python -m venv venv
@@ -223,7 +140,7 @@ source venv/bin/activate
 
 ---
 
-## 3️⃣ Install Dependencies
+### 3️⃣ Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -231,63 +148,55 @@ pip install -r requirements.txt
 
 ---
 
-## 4️⃣ Create .env File
+### 4️⃣ Create `.env`
 
 ```env
-GROQ_API_KEY=your_groq_api_key
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
 ---
 
-## 5️⃣ Run Backend
+### 5️⃣ Run Backend
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Backend runs at:
 
 ```text
-http://127.0.0.1:8000
+http://localhost:8000
 ```
 
-Swagger Docs:
+Swagger API Docs:
 
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8000/docs
 ```
 
 ---
 
-# 💻 Frontend Setup
+## Frontend Setup
 
-## 1️⃣ Navigate to Frontend
+### 1️⃣ Navigate to Frontend
 
 ```bash
-cd ../frontend
+cd frontend
 ```
 
----
-
-## 2️⃣ Install Dependencies
+### 2️⃣ Install Dependencies
 
 ```bash
 npm install
 ```
 
----
-
-## 3️⃣ Configure Environment Variable
-
-Create `.env`:
+### 3️⃣ Create `.env`
 
 ```env
-VITE_API_URL=http://127.0.0.1:8000
+VITE_API_URL=http://localhost:8000
 ```
 
----
-
-## 4️⃣ Run Frontend
+### 4️⃣ Run Frontend
 
 ```bash
 npm run dev
@@ -301,19 +210,9 @@ http://localhost:5173
 
 ---
 
-# 🌐 Deployment
+## 🌐 Deployment
 
-## Frontend Deployment (Vercel)
-
-Environment Variable:
-
-```env
-VITE_API_URL=https://rag-knowledge-assistant-zpwr.onrender.com
-```
-
----
-
-## Backend Deployment (Render)
+## Backend Deployment — Render
 
 ### Build Command
 
@@ -333,98 +232,137 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 python-3.11.9
 ```
 
----
+### Environment Variables
 
-# 🔍 API Endpoints
-
-| Method | Endpoint                       | Description                 |
-| ------ | ------------------------------ | --------------------------- |
-| GET    | `/`                            | Health check                |
-| POST   | `/upload`                      | Upload and index PDF        |
-| POST   | `/ask`                         | Ask questions from document |
-| POST   | `/summarize`                   | Generate AI summary         |
-| GET    | `/documents`                   | List uploaded collections   |
-| DELETE | `/documents/{collection_name}` | Delete collection           |
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
 ---
 
-# 🧠 How Retrieval-Augmented Generation (RAG) Works
+## Frontend Deployment — Vercel
 
-RAG combines:
+### Environment Variables
 
-* Information Retrieval
-* Vector Search
-* Large Language Models
+```env
+VITE_API_URL=https://rag-knowledge-assistant-zpwr.onrender.com
+```
 
-Workflow:
+### Important Notes
 
-1. PDF text is extracted
-2. Text is split into chunks
-3. Chunks are converted into vector embeddings
-4. ChromaDB stores embeddings
-5. User query is embedded
-6. Most relevant chunks are retrieved
-7. Retrieved context is sent to Groq LLM
-8. AI generates context-aware response
+* Do not add trailing slash in backend URL
+* Redeploy frontend after updating environment variables
+* Ensure backend URL is added in FastAPI `allow_origins`
 
----
+Example:
 
-# ⚡ Performance Optimizations
-
-* Lightweight ONNX embedding runtime
-* ChromaDB semantic retrieval
-* Optimized chunk sizes for faster indexing
-* Fast Groq inference
-* Reduced deployment memory usage for Render free tier
+```python
+allow_origins=[
+    "http://localhost:5173",
+    "https://rag-knowledge-assistant-sigma.vercel.app"
+]
+```
 
 ---
 
-# 📸 Screenshots
+## 🔌 API Endpoints
 
-## Upload & Chat Interface
-
-(Add screenshot here)
-
-## AI Summary Feature
-
-(Add screenshot here)
+| Method | Endpoint                       | Description                          |
+| ------ | ------------------------------ | ------------------------------------ |
+| GET    | `/`                            | Health check                         |
+| POST   | `/upload`                      | Upload and index PDF                 |
+| POST   | `/ask`                         | Ask questions from uploaded document |
+| POST   | `/summarize`                   | Generate AI summary                  |
+| GET    | `/documents`                   | List indexed documents               |
+| DELETE | `/documents/{collection_name}` | Delete document collection           |
 
 ---
 
-# 🎯 Future Improvements
+## ⚠️ Key Technical Decisions
 
-* Multi-document querying
-* Chat history persistence
+### Lightweight ONNX Embeddings Instead of PyTorch
+
+ChromaDB's `DefaultEmbeddingFunction` uses ONNX Runtime instead of PyTorch-based sentence-transformers.
+
+Benefits:
+
+* lower memory usage
+* faster deployment
+* Render free-tier compatibility
+* no heavy transformer dependencies
+
+This optimization helped the application run successfully within Render's 512MB free-tier memory limit.
+
+---
+
+### Groq Used for LLM Inference Only
+
+Groq powers:
+
+* question answering
+* document summarization
+
+using:
+
+```text
+llama-3.1-8b-instant
+```
+
+Embeddings are handled locally through ONNX-based ChromaDB embeddings.
+
+---
+
+### Deployment Challenges Solved
+
+Key engineering optimizations implemented:
+
+* removed PyTorch and sentence-transformers
+* replaced heavy embeddings with ONNX Runtime
+* optimized Render deployment for low memory usage
+* fixed Vercel environment variable configuration
+* solved CORS deployment issues
+* reduced chunk size for faster indexing and retrieval
+* preloaded embedding model during backend startup to reduce cold-start latency
+
+---
+
+### Per-Document Chat Memory
+
+Frontend maintains separate chat history for each uploaded document using React state keyed by `collection_name`.
+
+This allows users to:
+
+* switch between documents
+* preserve independent conversations
+* continue chats without losing context
+
+---
+
+## 📸 Screenshots
+
+### Upload & Chat Interface
+
+![alt text](image.png)
+
+### AI Summary Feature
+
+![alt text](image-1.png)
+
+---
+
+## 🎯 Future Improvements
+
+* Multi-file semantic search
+* Streaming AI responses
 * Authentication system
-* Streaming responses
-* Drag & drop multiple PDFs
+* Persistent chat history database
 * Support for DOCX and TXT files
-* Citation highlighting
+* Highlight citations from source chunks
+* Cloud vector database integration
 
 ---
 
-# 👨‍💻 Author
+## 👨‍💻 Author
 
-Kalyan Guntupalli
+Mohan Kalyan Guntupalli
 
-* AI/ML Enthusiast
-* Data Science Graduate Student
-* Passionate about Generative AI and Full-Stack AI Applications
-
----
-
-# 📜 License
-
-This project is for educational and portfolio purposes.
-
----
-
-# ⭐ Acknowledgements
-
-* FastAPI
-* ChromaDB
-* Groq
-* React
-* Vercel
-* Render
-* ONNX Runtime

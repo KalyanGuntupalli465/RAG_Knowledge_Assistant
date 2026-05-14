@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 MODEL = "llama-3.1-8b-instant"
 
+def _get_client():
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def build_rag_prompt(query: str, chunks: list[dict]) -> str:
     context_parts = []
@@ -34,8 +35,8 @@ INSTRUCTIONS:
 
 ANSWER:"""
 
-
 def ask_groq(query: str, chunks: list[dict]) -> str:
+    client = _get_client()  # ✅ created here
     prompt = build_rag_prompt(query, chunks)
     response = client.chat.completions.create(
         model=MODEL,
@@ -48,8 +49,8 @@ def ask_groq(query: str, chunks: list[dict]) -> str:
     )
     return response.choices[0].message.content.strip()
 
-
 def summarize_groq(chunks: list[dict]) -> str:
+    client = _get_client()  # ✅ created here
     combined = "\n\n".join(chunk.get("text", "") for chunk in chunks)
     response = client.chat.completions.create(
         model=MODEL,

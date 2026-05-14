@@ -1,22 +1,22 @@
-from sentence_transformers import SentenceTransformer
+import os
+import requests
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+EMBED_MODEL  = "nomic-embed-text-v1_5"   # free on Groq, 768-dim
 
 class Embedder:
-    def __init__(self):
-        self._model = None  # ← don't load at startup
-
-    @property
-    def model(self):
-        if self._model is None:
-            self._model = SentenceTransformer('all-MiniLM-L6-v2')  # ← loads only on first use
-        return self._model
-
     def embed(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             raise ValueError("No texts provided for embedding.")
-        embeddings = self.model.encode(
-            texts,
-            show_progress_bar=False,
-            convert_to_numpy=True,
-            normalize_embeddings=True
+
+        response = requests.post(
+            "https://api.groq.com/openai/v1/embeddings",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={"model": EMBED_MODEL, "input": texts},
         )
-        return embeddings.tolist()
+        response.raise_for_status()
+        data = response.json()
+        return [item["embedding"] for item in data["data"]]

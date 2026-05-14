@@ -10,7 +10,7 @@ def get_or_create_collection(collection_name: str):
     client = get_chroma_client()
     return client.get_or_create_collection(
         name=collection_name,
-        metadata={"hnsw:space": "cosine"}
+        metadata={"hnsw:space": "cosine"},
         embedding_function=None
     )
 

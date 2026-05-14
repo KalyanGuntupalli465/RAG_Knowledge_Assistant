@@ -2,7 +2,7 @@ import os
 import requests
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-EMBED_MODEL  = "nomic-embed-text-v1_5"   # free on Groq, 768-dim
+EMBED_MODEL  = "nomic-embed-text-v1_5"   
 
 class Embedder:
     def embed(self, texts: list[str]) -> list[list[float]]:

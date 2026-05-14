@@ -3,42 +3,57 @@ import { askQuestion } from "../api/client";
 import MessageBubble from "./MessageBubble";
 
 export default function ChatPanel({ activeDoc }) {
-  const [messages, setMessages] = useState([]);
+  const [chatHistories, setChatHistories] = useState({});
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef();
 
+  // Derive current messages from active doc
+  const messages = activeDoc ? (chatHistories[activeDoc.collection_name] || []) : [];
+
+  // Auto-scroll when messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    setMessages([]);
-  }, [activeDoc?.collection_name]);
+  const addMessage = (msg) => {
+    setChatHistories((prev) => ({
+      ...prev,
+      [activeDoc.collection_name]: [...(prev[activeDoc.collection_name] || []), msg],
+    }));
+  };
+
+  const replaceLastMessage = (msg) => {
+    setChatHistories((prev) => {
+      const current = prev[activeDoc.collection_name] || [];
+      return {
+        ...prev,
+        [activeDoc.collection_name]: [...current.slice(0, -1), msg],
+      };
+    });
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || !activeDoc || loading) return;
     const query = input.trim();
     setInput("");
 
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", text: query },
-      { role: "bot", text: "..." },
-    ]);
+    addMessage({ role: "user", text: query });
+    addMessage({ role: "bot", text: "..." });
     setLoading(true);
 
     try {
       const res = await askQuestion(activeDoc.collection_name, query);
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { role: "bot", text: res.data.answer, sources: res.data.sources },
-      ]);
+      replaceLastMessage({
+        role: "bot",
+        text: res.data.answer,
+        sources: res.data.sources,
+      });
     } catch (err) {
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { role: "bot", text: "Something went wrong. Please try again." },
-      ]);
+      replaceLastMessage({
+        role: "bot",
+        text: "Something went wrong. Please try again.",
+      });
     } finally {
       setLoading(false);
     }

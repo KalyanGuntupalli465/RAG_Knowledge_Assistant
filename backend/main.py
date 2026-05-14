@@ -21,21 +21,15 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://rag-knowledge-assistant-two.vercel.app/",
+        "https://rag-knowledge-assistant-two.vercel.app",  # ← removed trailing slash
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-parser   = PDFParser()
-chunker  = Chunker(chunk_size=500, overlap=50)
-embedder = Embedder()
-
 UPLOAD_DIR = "uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-
 
 
 class AskRequest(BaseModel):
@@ -60,6 +54,11 @@ async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
+    # ✅ Instantiated inside the function
+    parser  = PDFParser()
+    chunker = Chunker(chunk_size=500, overlap=50)
+    embedder = Embedder()
+
     file_id   = str(uuid.uuid4())
     file_path = os.path.join(UPLOAD_DIR, f"{file_id}.pdf")
 
@@ -67,24 +66,20 @@ async def upload_pdf(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, f)
 
     try:
-        # 1. Parse
         pages     = parser.parse(file_path)
         full_text = "\n".join(pages)
 
-        # 2. Chunks
         chunks = chunker.chunk(full_text)
         if not chunks:
             raise HTTPException(status_code=422, detail="Could not extract text from PDF.")
 
-        # 3. Embedding
         texts      = [c["text"] for c in chunks]
         embeddings = embedder.embed(texts)
 
-        # 4. Storing
         collection_name = file_id
         store_chunks(
             collection_name=collection_name,
-            chunks=chunks,           
+            chunks=chunks,
             embeddings=embeddings,
             file_name=file.filename
         )

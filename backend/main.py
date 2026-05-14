@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+from chromadb.utils import embedding_functions
+
 from rag_pipeline.pdf_parser import PDFParser
 from rag_pipeline.chunker import Chunker
 from rag_pipeline.vector_store import (
@@ -21,7 +23,21 @@ load_dotenv()
 
 app = FastAPI(title="RAG Knowledge Assistant API")
 
+# ─────────────────────────────────────────────
+# PRELOAD EMBEDDING MODEL
+# Prevents first-upload timeout on Render
+# ─────────────────────────────────────────────
+
+embedding_function = embedding_functions.DefaultEmbeddingFunction()
+
+# Warm up ONNX model
+embedding_function(["hello world"])
+
+
+# ─────────────────────────────────────────────
 # CORS
+# ─────────────────────────────────────────────
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -38,6 +54,9 @@ UPLOAD_DIR = "uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
+# ─────────────────────────────────────────────
+# Request Models
+# ─────────────────────────────────────────────
 
 class AskRequest(BaseModel):
     collection_name: str
@@ -50,9 +69,9 @@ class SummarizeRequest(BaseModel):
     top_k: int = 5
 
 
-
+# ─────────────────────────────────────────────
 # Routes
-
+# ─────────────────────────────────────────────
 
 @app.get("/")
 def root():
@@ -61,9 +80,9 @@ def root():
     }
 
 
-
+# ─────────────────────────────────────────────
 # Upload PDF
-
+# ─────────────────────────────────────────────
 
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
@@ -76,9 +95,10 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     parser = PDFParser()
 
+    # Reduced chunk size for faster processing
     chunker = Chunker(
-        chunk_size=500,
-        overlap=50
+        chunk_size=350,
+        overlap=30
     )
 
     file_id = str(uuid.uuid4())
@@ -88,17 +108,17 @@ async def upload_pdf(file: UploadFile = File(...)):
         f"{file_id}.pdf"
     )
 
-    
+    # Save uploaded PDF temporarily
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
     try:
-    
+        # Extract text from PDF
         pages = parser.parse(file_path)
 
         full_text = "\n".join(pages)
 
-       
+        # Create chunks
         chunks = chunker.chunk(full_text)
 
         if not chunks:
@@ -107,8 +127,10 @@ async def upload_pdf(file: UploadFile = File(...)):
                 detail="Could not extract text from PDF."
             )
 
+        # Unique collection per document
         collection_name = file_id
 
+        # Store chunks in ChromaDB
         store_chunks(
             collection_name=collection_name,
             chunks=chunks,
@@ -123,11 +145,14 @@ async def upload_pdf(file: UploadFile = File(...)):
         }
 
     finally:
-        
+        # Cleanup uploaded temp file
         if os.path.exists(file_path):
             os.remove(file_path)
 
 
+# ─────────────────────────────────────────────
+# Ask Questions
+# ─────────────────────────────────────────────
 
 @app.post("/ask")
 def ask(request: AskRequest):
@@ -148,13 +173,11 @@ def ask(request: AskRequest):
                 "sources": []
             }
 
-        
         answer = ask_groq(
             query=request.query,
             chunks=chunks
         )
 
-        
         sources = [
             {
                 "text": c["text"][:200] + "...",
@@ -175,7 +198,9 @@ def ask(request: AskRequest):
         )
 
 
-
+# ─────────────────────────────────────────────
+# Summarize Document
+# ─────────────────────────────────────────────
 
 @app.post("/summarize")
 def summarize(request: SummarizeRequest):
@@ -208,7 +233,9 @@ def summarize(request: SummarizeRequest):
         )
 
 
-
+# ─────────────────────────────────────────────
+# List Documents
+# ─────────────────────────────────────────────
 
 @app.get("/documents")
 def list_documents():
@@ -227,7 +254,9 @@ def list_documents():
         )
 
 
-
+# ─────────────────────────────────────────────
+# Delete Document
+# ─────────────────────────────────────────────
 
 @app.delete("/documents/{collection_name}")
 def delete_document(collection_name: str):

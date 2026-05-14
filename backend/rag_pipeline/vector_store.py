@@ -1,12 +1,8 @@
 import chromadb
 import os
 import uuid
-from chromadb.utils import embedding_functions
 
 CHROMA_PATH = os.path.join(os.path.dirname(__file__), "..", "chroma_db")
-
-# Lightweight ONNX embedding model
-embedding_function = embedding_functions.DefaultEmbeddingFunction()
 
 
 def get_chroma_client():
@@ -18,8 +14,7 @@ def get_or_create_collection(collection_name: str):
 
     return client.get_or_create_collection(
         name=collection_name,
-        metadata={"hnsw:space": "cosine"},
-        embedding_function=embedding_function
+        metadata={"hnsw:space": "cosine"}
     )
 
 
@@ -37,15 +32,15 @@ def store_chunks(
     for chunk in chunks:
         ids.append(str(uuid.uuid4()))
 
-        documents.append(chunk['text'])
+        documents.append(chunk["text"])
 
         metadatas.append({
             "file_name": file_name,
-            "chunk_index": chunk['chunk_index'],
-            "word_count": chunk['word_count']
+            "chunk_index": chunk["chunk_index"],
+            "word_count": chunk["word_count"]
         })
 
-    # Chroma automatically generates embeddings
+    # Chroma automatically creates embeddings
     collection.add(
         ids=ids,
         documents=documents,
@@ -63,7 +58,6 @@ def query_collection(
 
     collection = get_or_create_collection(collection_name)
 
-    # Chroma automatically embeds query
     results = collection.query(
         query_texts=[query_text],
         n_results=n_results,
@@ -73,14 +67,14 @@ def query_collection(
     retrieved = []
 
     for doc, meta, dist in zip(
-        results['documents'][0],
-        results['metadatas'][0],
-        results['distances'][0]
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0]
     ):
         retrieved.append({
             "text": doc,
-            "file_name": meta['file_name'],
-            "chunk_index": meta['chunk_index'],
+            "file_name": meta["file_name"],
+            "chunk_index": meta["chunk_index"],
             "similarity_score": round(1 - dist, 4)
         })
 
